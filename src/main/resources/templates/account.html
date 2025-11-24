@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Account Management - Banking Application</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .block {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin: 15px 0;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            font-weight: bold;
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            color: #333;
+            border-bottom: 2px solid #28a745;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin: 15px 0;
+        }
+
+        .form-group label {
+            display: inline-block;
+            width: 150px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        input[type="text"] {
+            width: 300px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            font-size: 14px;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #28a745;
+            box-shadow: 0 0 5px rgba(40,167,69,0.3);
+        }
+
+        button {
+            padding: 10px 20px;
+            margin: 10px 5px 10px 0;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 10px;
+            color: #007bff;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .account-id {
+            color: #666;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ========== BLOCK 1: ACCOUNT INFORMATION ========== -->
+<div class="block">
+    <div class="header">
+        Account Details
+    </div>
+
+    <div class="account-id">
+        Account ID: <span th:text="${account.accountId}">1</span>
+    </div>
+
+    <form th:action="@{/users/{userId}/accounts/{accountId}(userId=${userId}, accountId=${account.accountId})}"
+          th:object="${account}"
+          method="post">
+
+        <div class="form-group">
+            <label>Account Name:</label>
+            <input type="text" th:field="*{accountName}" required />
+        </div>
+
+        <button type="submit">Save Account Changes</button>
+    </form>
+</div>
+
+<!-- ========== BLOCK 2: NAVIGATION ========== -->
+<div class="block">
+    <div class="header">Navigation</div>
+
+    <a th:href="@{/users/{userId}(userId=${userId})}" class="back-link">
+        ← Back to User Account Information
+    </a>
+    <br/>
+    <a th:href="@{/users}" class="back-link">
+        ← Back to Users List
+    </a>
+</div>
+
+<!-- ========== BLOCK 3: ACCOUNT DETAILS (Future Enhancement) ========== -->
+<div class="block">
+    <div class="header">Account Summary</div>
+
+    <p style="color: #666; font-style: italic;">
+        Transaction history and account balance will be displayed here in a future update.
+    </p>
+
+    <!-- Placeholder for future transaction display -->
+    <!--
+    <div class="section-title">Recent Transactions:</div>
+    <div th:each="transaction : ${account.transactions}">
+        <p>
+            <span th:text="${transaction.transactionDate}">Date</span> -
+            <span th:text="${transaction.type == 'D' ? 'Deposit' : 'Withdrawal'}">Type</span> -
+            $<span th:text="${transaction.amount}">0.00</span>
+        </p>
+    </div>
+    -->
+</div>
+
+</body>
+</html>

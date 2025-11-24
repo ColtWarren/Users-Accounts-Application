@@ -1,40 +1,151 @@
 <!DOCTYPE html>
-<html xmlns:th="http://thymeleaf.org">
-	<head>
-		<title>Users</title>
-	</head>
-	<body>
-		<h1>Users</h1>
-		
-		<div th:if="${#lists.size(users) == 1}">
-			<form action="" method="post">
-				<div>
-					Username: <input type="text" th:field="${user.username}" />
-				</div>
-				<div>
-					Password: <input type="password" th:field="${user.password}" />
-				</div>
-				<div>
-					Full Name: <input type="text" th:field="${user.name}" />
-				</div>
-				<div>
-					<input type="submit" value="Update User Account" />
-				</div>
-			</form>
-			<form th:action="@{/users/{userId}/delete(userId=${user.userId})}" method="post">
-				<input type="submit" value="Delete User Account" />
-			</form>
-		</div>
-		
-		<div th:unless="${#lists.size(users) == 1}" th:each="user : ${users}">
-		    <span th:text="${user.userId}"></span><br/>
-			<span th:text="${user.username}"></span><br/>
-			<span th:text="${user.name}"></span><br/>
-			<span th:text="${user.password}"></span>
-			<div th:each="account : ${user.accounts}">
-				<span th:text="${account.accountName}"></span>
-			</div>
-			<hr/>
-		</div>
-	</body>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Users - Banking Application</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .header {
+            font-weight: bold;
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .user-block {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin: 15px 0;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .user-block hr {
+            border: none;
+            border-top: 2px solid #007bff;
+            margin: 10px 0;
+        }
+
+        .user-id {
+            font-size: 1.2em;
+            color: #007bff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .user-id:hover {
+            text-decoration: underline;
+        }
+
+        .user-info {
+            margin: 10px 0;
+            color: #555;
+        }
+
+        .user-info strong {
+            color: #333;
+        }
+
+        .accounts-section {
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+        }
+
+        .account-link {
+            display: inline-block;
+            margin: 5px 10px 5px 0;
+            padding: 5px 10px;
+            background-color: #28a745;
+            color: white;
+            text-decoration: none;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+
+        .account-link:hover {
+            background-color: #218838;
+            text-decoration: none;
+        }
+
+        .no-users {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+            font-style: italic;
+        }
+
+        .register-link {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+
+        .register-link:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+<div class="header">Users</div>
+
+<!-- Link to registration page -->
+<div>
+    <a href="/register" class="register-link">Register New User</a>
+</div>
+
+<!-- Display message if no users exist -->
+<div th:if="${users.isEmpty()}" class="no-users">
+    No users found. Click "Register New User" to create your first user.
+</div>
+
+<!-- Loop through all users -->
+<div th:each="user : ${users}" class="user-block">
+    <hr/>
+
+    <!-- User ID (clickable link to user detail page) -->
+    <p>
+        <a th:href="@{/users/{userId}(userId=${user.userId})}" class="user-id">
+            User #<span th:text="${user.userId}">1</span>
+        </a>
+    </p>
+
+    <!-- User Information -->
+    <p class="user-info">
+        <strong>Username:</strong> <span th:text="${user.username}">username</span>
+    </p>
+    <p class="user-info">
+        <strong>Full Name:</strong> <span th:text="${user.name}">John Doe</span>
+    </p>
+    <p class="user-info">
+        <strong>Created:</strong> <span th:text="${user.createdDate}">2025-01-01</span>
+    </p>
+
+    <!-- User's Accounts -->
+    <div class="accounts-section">
+        <strong>Accounts:</strong><br/>
+        <div th:each="account, stat : ${user.accounts}">
+            <a th:href="@{/users/{userId}/accounts/{accountId}(userId=${user.userId}, accountId=${account.accountId})}"
+               class="account-link">
+                <span th:text="${account.accountName}">Account Name</span>
+            </a>
+        </div>
+
+        <!-- Message if user has no accounts -->
+        <div th:if="${user.accounts.isEmpty()}" style="color: #999; font-style: italic;">
+            No accounts yet.
+        </div>
+    </div>
+</div>
+</body>
 </html>

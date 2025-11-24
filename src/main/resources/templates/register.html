@@ -1,24 +1,279 @@
 <!DOCTYPE html>
-<html xmlns:th="http://thymeleaf.org">
-	<head>
-		<title>Create Account</title>
-	</head>
-	<body>
-		<h1>Create Your Account</h1>
-		
-		<form action="" method="post">
-			<div>
-				Username: <input type="text" th:field="${user.username}" />
-			</div>
-			<div>
-				Password: <input type="password" th:field="${user.password}" />
-			</div>
-			<div>
-				Full Name: <input type="text" th:field="${user.name}" />
-			</div>
-			<div>
-				<input type="submit" value="Create Account" />
-			</div>
-		</form>
-	</body>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${user.userId != null ? 'User Account Information' : 'Register New User'}">User Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .block {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin: 15px 0;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            font-weight: bold;
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            color: #333;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin: 15px 0;
+        }
+
+        .form-group label {
+            display: inline-block;
+            width: 150px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 300px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            font-size: 14px;
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 5px rgba(0,123,255,0.3);
+        }
+
+        button {
+            padding: 10px 20px;
+            margin: 10px 5px 10px 0;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #218838;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+
+        .account-link {
+            display: inline-block;
+            margin: 5px 10px 5px 0;
+            padding: 8px 15px;
+            background-color: #17a2b8;
+            color: white;
+            text-decoration: none;
+            border-radius: 3px;
+        }
+
+        .account-link:hover {
+            background-color: #138496;
+            text-decoration: none;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 10px;
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .section-title {
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ========== BLOCK 1: USER INFORMATION ========== -->
+<div class="block">
+    <div class="header">
+        <span th:if="${user.userId == null}">Register New User</span>
+        <span th:if="${user.userId != null}">User Information</span>
+    </div>
+
+    <form th:action="${user.userId != null ? '/users/' + user.userId : '/register'}"
+          th:object="${user}"
+          method="post">
+
+        <!-- Hidden field for userId (important for updates) -->
+        <input type="hidden" th:field="*{userId}" />
+
+        <div class="form-group">
+            <label>Username:</label>
+            <input type="text" th:field="*{username}" required />
+        </div>
+
+        <div class="form-group">
+            <label>Password:</label>
+            <input type="password" th:field="*{password}" required />
+        </div>
+
+        <div class="form-group">
+            <label>Full Name:</label>
+            <input type="text" th:field="*{name}" required />
+        </div>
+
+        <!-- Show created date only for existing users -->
+        <div class="form-group" th:if="${user.userId != null}">
+            <label>Created Date:</label>
+            <input type="text" th:value="${user.createdDate}" readonly
+                   style="background-color: #f0f0f0; cursor: not-allowed;" />
+        </div>
+
+        <!-- Different button text for registration vs update -->
+        <button type="submit" class="btn-primary" th:if="${user.userId == null}">
+            Register User
+        </button>
+        <button type="submit" class="btn-primary" th:if="${user.userId != null}">
+            Update User Information
+        </button>
+    </form>
+</div>
+
+<!-- ========== BLOCK 2: ADDRESS INFORMATION (Only for existing users) ========== -->
+<div class="block" th:if="${user.userId != null}">
+    <div class="header">Address Information</div>
+
+    <form th:action="@{/users/{userId}(userId=${user.userId})}"
+          th:object="${user}"
+          method="post">
+
+        <!-- Hidden field for userId -->
+        <input type="hidden" th:field="*{userId}" />
+
+        <!-- Hidden fields for user data to preserve them -->
+        <input type="hidden" th:field="*{username}" />
+        <input type="hidden" th:field="*{password}" />
+        <input type="hidden" th:field="*{name}" />
+        <input type="hidden" th:field="*{createdDate}" />
+
+        <!-- Address fields -->
+        <div th:object="${user.address}">
+            <div class="form-group">
+                <label>Address Line 1:</label>
+                <input type="text" th:field="*{addressLine1}" />
+            </div>
+
+            <div class="form-group">
+                <label>Address Line 2:</label>
+                <input type="text" th:field="*{addressLine2}" />
+            </div>
+
+            <div class="form-group">
+                <label>City:</label>
+                <input type="text" th:field="*{city}" />
+            </div>
+
+            <div class="form-group">
+                <label>Region:</label>
+                <input type="text" th:field="*{region}" />
+            </div>
+
+            <div class="form-group">
+                <label>Country:</label>
+                <input type="text" th:field="*{country}" />
+            </div>
+
+            <div class="form-group">
+                <label>Zip Code:</label>
+                <input type="text" th:field="*{zipCode}" />
+            </div>
+        </div>
+
+        <button type="submit" class="btn-primary">Update Address</button>
+    </form>
+
+    <!-- Delete User Button (separate form for safety) -->
+    <form th:action="@{/users/{userId}/delete(userId=${user.userId})}"
+          method="post"
+          style="display: inline;"
+          onsubmit="return confirm('Are you sure you want to delete this user? This action cannot be undone.');">
+        <button type="submit" class="btn-danger">Delete User Account</button>
+    </form>
+</div>
+
+<!-- ========== BLOCK 3: ACCOUNTS MANAGEMENT (Only for existing users) ========== -->
+<div class="block" th:if="${user.userId != null}">
+    <div class="header">Bank Accounts</div>
+
+    <div class="section-title">Existing Accounts:</div>
+
+    <!-- Display all accounts -->
+    <div th:if="${!user.accounts.isEmpty()}">
+        <div th:each="account, stat : ${user.accounts}">
+            <a th:href="@{/users/{userId}/accounts/{accountId}(userId=${user.userId}, accountId=${account.accountId})}"
+               class="account-link">
+                <span th:text="${account.accountName}">Account Name</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Message if no accounts -->
+    <div th:if="${user.accounts.isEmpty()}" style="color: #999; font-style: italic; margin: 10px 0;">
+        No accounts yet. Create your first account below.
+    </div>
+
+    <!-- Create New Account Button -->
+    <form th:action="@{/users/{userId}/accounts(userId=${user.userId})}"
+          method="post"
+          style="margin-top: 20px;">
+        <button type="submit" class="btn-success">Create New Bank Account</button>
+    </form>
+
+    <!-- Back to Users List Link -->
+    <div style="margin-top: 20px;">
+        <a th:href="@{/users}" class="back-link">← Back to Users List</a>
+    </div>
+</div>
+
+<!-- ========== REGISTRATION SUCCESS MESSAGE (Only after registration) ========== -->
+<div class="block" th:if="${user.userId == null}">
+    <a th:href="@{/users}" class="back-link">← Back to Users List</a>
+</div>
+
+</body>
 </html>
